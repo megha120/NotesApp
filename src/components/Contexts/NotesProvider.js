@@ -7,24 +7,32 @@ const dummyList = [
     title: "",
     text: "abcd",
     color: "white",
+    type: "normal",
+    label: null,
   },
   {
     id: 2,
     title: "Name",
     text: "Megha",
     color: "white",
+    type: "normal",
+    label: null,
   },
   {
     id: 3,
     title: "City",
     text: "Delhi",
     color: "white",
+    type: "normal",
+    label: null,
   },
   {
     id: 4,
     title: "Country",
     text: "This is a app for creating and storing notes. You can manage your trivial information here!",
     color: "white",
+    type: "normal",
+    label: null,
   },
 ];
 
@@ -32,6 +40,7 @@ const defaultState = {
   items: dummyList,
   pinnedItems: [],
   isDeleted: false,
+  labels: [],
 };
 
 const NotesReducer = (state, action) => {
@@ -42,6 +51,7 @@ const NotesReducer = (state, action) => {
       items: updatedItems,
       pinnedItems: state.pinnedItems,
       isDeleted: false,
+      labels: state.labels,
     };
   }
   if (action.type === "Delete") {
@@ -50,6 +60,7 @@ const NotesReducer = (state, action) => {
       items: updatedItems,
       pinnedItems: state.pinnedItems,
       isDeleted: true,
+      labels: state.labels,
     };
   }
   if (action.type === "Reset") {
@@ -57,6 +68,7 @@ const NotesReducer = (state, action) => {
       items: state.items,
       pinnedItems: state.pinnedItems,
       isDeleted: false,
+      labels: state.labels,
     };
   }
   if (action.type === "Update") {
@@ -66,10 +78,17 @@ const NotesReducer = (state, action) => {
       }
       return item;
     });
+    let updatedPinnedItems = state.pinnedItems.map((item) => {
+      if (item.id === action.id) {
+        return action.item;
+      }
+      return item;
+    });
     return {
       items: updatedItems,
-      pinnedItems: state.pinnedItems,
+      pinnedItems: updatedPinnedItems,
       isDeleted: false,
+      labels: state.labels,
     };
   }
   if (action.type === "Pin") {
@@ -78,6 +97,7 @@ const NotesReducer = (state, action) => {
       items: state.items,
       pinnedItems: updatedItems,
       isDeleted: false,
+      labels: state.labels,
     };
   }
   if (action.type === "Unpin") {
@@ -88,7 +108,25 @@ const NotesReducer = (state, action) => {
       items: state.items,
       pinnedItems: updatedItems,
       isDeleted: false,
+      labels: state.labels,
     };
+  }
+  if (action.type === "Label") {
+    if (state.labels.includes(action.label)) {
+      return {
+        items: state.items,
+        pinnedItems: state.pinnedItems,
+        isDeleted: false,
+        labels: state.labels,
+      };
+    } else {
+      return {
+        items: state.items,
+        pinnedItems: state.pinnedItems,
+        isDeleted: false,
+        labels: state.labels.concat(action.label),
+      };
+    }
   }
   return defaultState;
 };
@@ -136,9 +174,16 @@ const NotesProvider = (props) => {
       id: id,
     });
   };
+  const addLabel = (label) => {
+    dispatchAction({
+      type: "Label",
+      label: label,
+    });
+  };
   const notesContext = {
     items: notesState.items,
     pinnedItems: notesState.pinnedItems,
+    labels: notesState.labels,
     addItem: addItemToNotes,
     removeItem: removeItemFromNotes,
     pinItem: addPinItem,
@@ -146,6 +191,7 @@ const NotesProvider = (props) => {
     isDeleted: notesState.isDeleted,
     resetDeleted: resetDeleted,
     updateItem: updateItem,
+    addLabel: addLabel,
   };
 
   return (

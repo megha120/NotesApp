@@ -3,6 +3,7 @@ import React from "react";
 const NotesContext = React.createContext({
   items: [],
   pinnedItems: [],
+  labels: [],
   addItem: (item) => {},
   removeItem: (id) => {},
   pinItem: (item) => {},
@@ -10,6 +11,7 @@ const NotesContext = React.createContext({
   isDeleted: false,
   resetDeleted: () => {},
   updateItem: () => {},
+  addLabel: () => {},
 });
 
 export default NotesContext;
